@@ -1,0 +1,32 @@
+import { useState, useEffect } from 'react';
+import Papa from 'papaparse';
+
+export function useFile<T = any>() {
+    const [data, setData] = useState<T[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const checkData = () => {
+            // @ts-ignore
+            const rawData = window.vstoCsvData;
+            if (rawData) {
+                Papa.parse(rawData, {
+                    header: true,
+                    dynamicTyping: true,
+                    skipEmptyLines: true,
+                    complete: (results) => {
+                        setData(results.data as T[]);
+                        setLoading(false);
+                    }
+                });
+            } else {
+                // Retry shortly if not ready yet
+                setTimeout(checkData, 500);
+            }
+        };
+
+        checkData();
+    }, []);
+
+    return { data, loading };
+}
