@@ -127,24 +127,25 @@
       <h1>deckify</h1>
       <p class="tagline">Streamline deck creation for Microsoft PowerPoint.</p>
 
-      <a class="install-button" href="Deckify.vsto">Install deckify</a>
-      <p class="hint">Click the button, then choose <strong>Open</strong> when your browser asks.</p>
+      <a class="install-button" href="https://github.com/tillmannschatz/deckify/releases/latest/download/deckify-installer.exe">Download Installer</a>
+      <p class="hint">Single <code>.exe</code> &mdash; double-click and confirm the trust prompt to install.</p>
 
       <details>
-        <summary>Power-user install (PowerShell)</summary>
-        <p>Skip the browser entirely &mdash; calls VSTOInstaller directly with the Pages URL:</p>
+        <summary>What happens when I run the installer?</summary>
+        <p>The installer is a self-extracting bundle that unpacks the ClickOnce payload to a temp folder and launches <code>setup.exe</code> automatically. ClickOnce shows a one-time <em>"Microsoft Office Customization Installer"</em> trust prompt for the publisher cert &mdash; click <strong>Install</strong> to proceed.</p>
+        <p>Subsequent updates happen silently in the background once installed (ClickOnce checks every 7 days against <code>https://tillmannschatz.github.io/deckify/</code>).</p>
+      </details>
+
+      <details>
+        <summary>Power-user install (PowerShell, no download)</summary>
+        <p>Installs directly from the Pages endpoint without writing to disk:</p>
 <pre><code>&amp; "C:\Program Files\Common Files\Microsoft Shared\VSTO\10.0\VSTOInstaller.exe" /Install https://tillmannschatz.github.io/deckify/Deckify.vsto</code></pre>
+        <p>Note: requires the publisher cert to already be in your <code>Trusted Publishers</code> store. The installer above handles that automatically via the trust prompt.</p>
       </details>
 
       <details>
-        <summary>Offline / corporate install</summary>
-        <p>Download the latest <code>deckify-X.Y.Z.7z</code> bundle from <a href="https://github.com/tillmannschatz/deckify/releases">GitHub Releases</a>, extract the archive, and run <code>setup.exe</code> from <em>inside</em> the extracted folder. The 7z contains <code>setup.exe</code>, <code>Deckify.vsto</code>, and the <code>Application Files</code> folder side-by-side &mdash; ClickOnce needs all three together.</p>
-      </details>
-
-      <details>
-        <summary>Why not just download setup.exe?</summary>
-        <p>ClickOnce&rsquo;s <code>setup.exe</code> looks for <code>Deckify.vsto</code> in the same folder as the EXE. If you grab just <code>setup.exe</code> from the GitHub Releases asset list, the manifest isn&rsquo;t there and the install fails. Likewise, downloading <code>Deckify.vsto</code> directly from a GitHub Releases URL puts it in the wrong security zone (<code>github.com</code> vs the manifest&rsquo;s expected <code>tillmannschatz.github.io</code>) &mdash; ClickOnce rejects it.</p>
-        <p>The Install button above downloads the manifest from the right origin, so it just works.</p>
+        <summary>Offline / archive install</summary>
+        <p>The <code>deckify-X.Y.Z.7z</code> archive on <a href="https://github.com/tillmannschatz/deckify/releases">GitHub Releases</a> contains the raw ClickOnce output (<code>setup.exe</code>, <code>Deckify.vsto</code>, <code>Application Files/</code>). Extract it and run <code>setup.exe</code> from <em>inside</em> the extracted folder &mdash; same trust prompt as the installer.</p>
       </details>
 
       <footer>
