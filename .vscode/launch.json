@@ -1,0 +1,11 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Attach to PowerPoint (POWERPNT.EXE)",
+            "type": "clr",
+            "request": "attach",
+            "processName": "POWERPNT.EXE"
+        }
+    ]
+}

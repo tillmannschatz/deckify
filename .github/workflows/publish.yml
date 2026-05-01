@@ -1,0 +1,201 @@
+name: publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Semver version to release (e.g. 0.1.8)'
+        required: true
+        type: string
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    env:
+      # microsoft/setup-msbuild@v2 and peaceiris/actions-gh-pages@v4 still ship
+      # with Node.js 20 (deprecated; forced removal 2026-09-16). Opt into Node 24
+      # now until upstream releases bump.
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          ref: development
+          fetch-depth: 0
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Restore PFX and import into cert stores
+        shell: pwsh
+        run: |
+          $pfxPath = "$env:GITHUB_WORKSPACE\src\Deckify\effensify.pfx"
+          $bytes = [Convert]::FromBase64String($env:PFX_BASE64)
+          [IO.File]::WriteAllBytes($pfxPath, $bytes)
+
+          $securePassword = ConvertTo-SecureString -String $env:PFX_PASSWORD -AsPlainText -Force
+
+          # CurrentUser store — for MSBuild ClickOnce manifest signing (mage.exe)
+          $importedUser = Import-PfxCertificate -FilePath $pfxPath -CertStoreLocation Cert:\CurrentUser\My -Password $securePassword
+          # LocalMachine store — for signtool.exe signing setup.exe
+          $importedMachine = Import-PfxCertificate -FilePath $pfxPath -CertStoreLocation Cert:\LocalMachine\My -Password $securePassword
+
+          # Pick the leaf cert (one with HasPrivateKey = $true) in case the PFX bundles a CA chain
+          $leaf = $importedUser | Where-Object { $_.HasPrivateKey } | Select-Object -First 1
+          if (-not $leaf) { $leaf = $importedUser | Select-Object -First 1 }
+          $thumbprint = $leaf.Thumbprint
+
+          Write-Host "Imported cert thumbprint: $thumbprint"
+          Write-Host "Subject:                  $($leaf.Subject)"
+          Write-Host "NotAfter:                 $($leaf.NotAfter)"
+          Write-Host "EnhancedKeyUsage(s):"
+          if ($leaf.EnhancedKeyUsageList -and $leaf.EnhancedKeyUsageList.Count -gt 0) {
+            $leaf.EnhancedKeyUsageList | ForEach-Object { Write-Host "  - $($_.FriendlyName) ($($_.ObjectId))" }
+          } else {
+            Write-Host "  (none — no EKU restrictions; signtool may still accept)"
+          }
+
+          "MANIFEST_THUMBPRINT=$thumbprint" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+          # Export the public-key portion of the cert (no private key) so the
+          # installer can import it into the user's TrustedPublisher store and
+          # VSTOInstaller can run silently without a "untrusted publisher" error.
+          $cerPath = "$env:GITHUB_WORKSPACE\deckify-publisher.cer"
+          Export-Certificate -Cert $leaf -FilePath $cerPath -Type CERT | Out-Null
+          Write-Host "Exported public-key cert: $cerPath"
+        env:
+          PFX_BASE64: ${{ secrets.PFX_BASE64 }}
+          PFX_PASSWORD: ${{ secrets.PFX_PASSWORD }}
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v2
+
+      - name: NuGet restore
+        run: nuget restore Deckify.sln
+
+      - name: Run tests
+        run: dotnet test tests/Deckify.Tests/Deckify.Tests.csproj --configuration Release --nologo
+
+      - name: Resolve signtool path
+        shell: pwsh
+        run: |
+          # Used by the helper-EXE post-build target during Publish AND by the
+          # Sign-installer step later. Resolved once and exported via env.
+          $signtool = (Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin" -Filter "signtool.exe" -Recurse -ErrorAction SilentlyContinue |
+            Where-Object { $_.FullName -match "\\x64\\" } |
+            Sort-Object FullName -Descending |
+            Select-Object -First 1).FullName
+          if (-not $signtool) { throw "signtool.exe not found in Windows Kits 10" }
+          Write-Host "Using signtool at: $signtool"
+          "SIGNTOOL=$signtool" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Publish (ClickOnce)
+        shell: pwsh
+        run: |
+          # SignHelperThumbprint + SignToolPath drive the post-build target in
+          # Deckify.UpdateHelper.csproj that Authenticode-signs Deckify.UpdateHelper.exe
+          # *before* ClickOnce computes manifest hashes — signed bytes go into the
+          # manifest, end-user Defender accepts the signed helper, and the manifest
+          # hashes match what's actually on disk.
+          msbuild src/Deckify/Deckify.csproj `
+            /t:Publish `
+            /p:Configuration=Release `
+            /p:PublishDir="${{ github.workspace }}\publish\" `
+            /p:ApplicationVersion=${{ inputs.version }}.0 `
+            /p:PublishUrl=https://tillmannschatz.github.io/deckify/ `
+            /p:InstallUrl=https://tillmannschatz.github.io/deckify/ `
+            /p:UpdateUrl=https://tillmannschatz.github.io/deckify/ `
+            /p:MapFileExtensions=true `
+            /p:GenerateApplicationManifest=true `
+            /p:SignAssembly=false `
+            /p:AssemblyOriginatorKeyFile= `
+            /p:DelaySign=false `
+            /p:ManifestCertificateThumbprint=$env:MANIFEST_THUMBPRINT `
+            /p:SignHelperThumbprint=$env:MANIFEST_THUMBPRINT `
+            /p:SignToolPath="$env:SIGNTOOL"
+
+      - name: Pack 7z asset
+        shell: pwsh
+        run: |
+          choco install 7zip --yes --no-progress
+          7z a "deckify-${{ inputs.version }}.7z" ".\publish\*"
+
+      - name: Build single-file installer (Inno Setup)
+        shell: pwsh
+        run: |
+          $iscc = 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe'
+          if (-not (Test-Path $iscc)) { throw "Inno Setup compiler not found at $iscc" }
+          $publishDir = "$env:GITHUB_WORKSPACE\publish"
+          & $iscc /Q "/O$env:GITHUB_WORKSPACE" "/DAppVersion=${{ inputs.version }}" "/DPublishDir=$publishDir" "$env:GITHUB_WORKSPACE\tools\deckify-installer.iss"
+          if ($LASTEXITCODE -ne 0) { throw "ISCC compile failed (exit $LASTEXITCODE)" }
+          if (-not (Test-Path 'deckify-installer.exe')) { throw 'deckify-installer.exe not produced' }
+          $size = (Get-Item 'deckify-installer.exe').Length / 1MB
+          Write-Host ("Installer built: {0:N2} MB" -f $size)
+
+      - name: Sign deckify-installer.exe
+        shell: pwsh
+        run: |
+          # Authenticode-sign the Inno installer with the same self-signed
+          # cert used for the ClickOnce manifests. Unsigned Inno-Setup output
+          # gets flagged as Trojan:Win32/Wacatac.H!ml by Defender's ML
+          # heuristics on a per-build random basis. A signed binary (even
+          # with a self-signed cert) gives Defender enough metadata to
+          # mostly suppress the false positive.
+          $exe = "$env:GITHUB_WORKSPACE\deckify-installer.exe"
+          # /sha1 picks the cert by thumbprint from the user/machine store
+          # (we imported PFX into both earlier). /tr gives the signed binary
+          # an RFC 3161 timestamp so it stays valid past cert expiry.
+          & $env:SIGNTOOL sign `
+            /sha1 $env:MANIFEST_THUMBPRINT `
+            /fd SHA256 `
+            /tr "http://timestamp.digicert.com" `
+            /td SHA256 `
+            $exe
+          if ($LASTEXITCODE -ne 0) { throw "signtool sign failed (exit $LASTEXITCODE)" }
+          # Skip `signtool verify /pa` — that checks trust chain, and our
+          # self-signed cert isn't in the runner's Trusted Root store, so
+          # verify always fails. The fact that sign succeeded means the
+          # binary IS signed; end-user Defender/SmartScreen will do their
+          # own validation on the user's machine.
+          Write-Host "deckify-installer.exe Authenticode-signed"
+
+      - name: Stage public cert for gh-pages
+        shell: pwsh
+        run: |
+          $cerPath = "$env:GITHUB_WORKSPACE\deckify-publisher.cer"
+          if (-not (Test-Path $cerPath)) { throw "Public-key cert not at $cerPath (export step did not run?)" }
+          Copy-Item $cerPath "$env:GITHUB_WORKSPACE\publish\deckify-publisher.cer" -Force
+          Write-Host "Staged public cert for gh-pages: publish\deckify-publisher.cer"
+
+      - name: Deploy to deckify/gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          personal_token: ${{ secrets.DECKIFY_PAT }}
+          external_repository: tillmannschatz/deckify
+          publish_dir: ./publish
+          publish_branch: gh-pages
+          force_orphan: false
+          keep_files: true
+          commit_message: 'publish v${{ inputs.version }}'
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Create GitHub Release in deckify
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.DECKIFY_PAT }}
+        run: |
+          gh release create "v${{ inputs.version }}" `
+            "deckify-installer.exe" `
+            "deckify-${{ inputs.version }}.7z" `
+            --repo tillmannschatz/deckify `
+            --title "deckify ${{ inputs.version }}" `
+            --notes "## Install`n`n**Recommended:** open [https://tillmannschatz.github.io/deckify/setup.exe](https://tillmannschatz.github.io/deckify/setup.exe) in your browser. ClickOnce-direct path -- Microsoft-signed bootstrapper, no Defender false-positive risk. Trust prompt appears once (yellow icon, 'Publisher cannot be verified'); click ``Install``.`n`nUpdates after install are automatic via the in-app toast notification (no installer.exe download needed).`n`n### Alternative: bundled installer`n`n[deckify-installer.exe](https://github.com/tillmannschatz/deckify/releases/latest/download/deckify-installer.exe) -- single .exe, double-click. Same end result, but subject to Defender false-positives on a per-build basis. If blocked, use the ClickOnce-direct path above instead.`n`n### Offline / archive`n`n``deckify-${{ inputs.version }}.7z`` contains the raw ClickOnce output for archival or offline distribution."
+
+      - name: Cleanup PFX
+        if: always()
+        shell: pwsh
+        run: Remove-Item -Path src/Deckify/effensify.pfx -ErrorAction SilentlyContinue

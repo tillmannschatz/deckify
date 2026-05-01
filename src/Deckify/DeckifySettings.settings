@@ -1,0 +1,39 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Deckify" GeneratedClassName="DeckifySettings">
+  <Profiles />
+  <Settings>
+    <Setting Name="DynamicUI" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="AutoFocus" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="DefaultTab" Type="System.String" Scope="User">
+      <Value Profile="(Default)">deckify</Value>
+    </Setting>
+    <Setting Name="AutoCheckUpdate" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="DevMode" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="LicenseKey" Type="System.String" Scope="User">
+      <Value Profile="(Default)">3a65e5bb-7ba2-4de1-9d50-0079d128cb2f</Value>
+    </Setting>
+    <Setting Name="LicenseKeyHolder" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Tillmann Schatz</Value>
+    </Setting>
+    <Setting Name="LicenseKeyValidity" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="SendUsageStatistics" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="MDPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="LicenseKeyEmail" Type="System.String" Scope="User">
+      <Value Profile="(Default)">tillmannschatz@gmail.com</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

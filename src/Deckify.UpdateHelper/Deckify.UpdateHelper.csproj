@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>12.0</LangVersion>
+    <RootNamespace>Deckify.UpdateHelper</RootNamespace>
+    <AssemblyName>Deckify.UpdateHelper</AssemblyName>
+    <Nullable>disable</Nullable>
+    <Deterministic>true</Deterministic>
+    <UseWindowsForms>false</UseWindowsForms>
+    <UseWPF>false</UseWPF>
+  </PropertyGroup>
+
+  <!--
+    Strong-Naming nur unter VS-MSBuild (Full Framework). Konsistent mit Deckify.Core.
+  -->
+  <PropertyGroup Condition="'$(MSBuildRuntimeType)' == 'Full'">
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\Deckify\effensify.pfx</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <!--
+    Authenticode-sign the helper EXE post-build when running in CI. The helper is
+    invoked by the add-in to restart PowerPoint after an update; signing it with
+    the same effensify cert as deckify-installer.exe means Defender's ML heuristic
+    won't flag it (signed binaries from a known publisher bypass content-pattern
+    scans). Local dev builds skip this — the SignHelperThumbprint and SignToolPath
+    properties are only set by the publish.yml workflow.
+  -->
+  <Target Name="SignHelperExe" AfterTargets="Build"
+          Condition="'$(SignHelperThumbprint)' != '' and '$(SignToolPath)' != ''">
+    <Exec Command="&quot;$(SignToolPath)&quot; sign /sha1 $(SignHelperThumbprint) /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 &quot;$(TargetPath)&quot;" />
+  </Target>
+
+</Project>

@@ -1,0 +1,8 @@
+{
+    "dotnet.preferCSharpExtension": true,
+    "claudeCode.selectedModel": "opus",
+    "claudeCode.environmentVariables": [
+        { "name": "CLAUDE_CODE_EFFORT_LEVEL", "value": "max" },
+        { "name": "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING", "value": "1" }
+    ]
+}

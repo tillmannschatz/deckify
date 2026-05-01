@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet test:*)",
+      "Bash(dotnet build:*)",
+      "Bash(MSBuild.exe:*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git branch:*)",
+      "PowerShell(dotnet test*)",
+      "PowerShell(dotnet build*)",
+      "PowerShell(MSBuild*)"
+    ]
+  },
+  "enabledPlugins": {
+    "dotnet-msbuild@dotnet-agent-skills": true,
+    "dotnet-nuget@dotnet-agent-skills": true,
+    "superpowers@claude-plugins-official": true
+  }
+}

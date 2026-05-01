@@ -1,0 +1,342 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui" onLoad="Ribbon_Load" loadImage="GetImage">
+  <ribbon>
+    <tabs>
+      <tab id="deckify" label="deckify" keytip="D">
+
+        <!-- NEW GROUP: HELP -->
+        <group id="helpGroup" label="Help" imageMso="Help" >
+          <button id="InfoButton" label="About deckify" imageMso="Info" screentip="About" onAction="openAbout" showLabel="false" />
+          <button id="SettingsButton" label="deckify Settings" image="settings_lines" screentip="Settings" onAction="openSettings" showLabel="false" enabled="true"/>
+          <button idMso="AdvancedFileProperties" imageMso="ChooseForm" showLabel="false" />
+          <button id="OpenLogFileButton" label="Open Log File" imageMso="TraceError" screentip="Open the error log file" onAction="OpenLogFile" showLabel="false" getVisible="GetDevelopmentVisibility" />
+        </group>
+
+        <!-- NEW GROUP: REVIEW -->
+        <group id="reviewGroup" label="Review" imageMso="First10RecordsPreview" >
+          <button idMso="WindowNew" showLabel="false" />
+          <button id="RemoveAnimationsButton" label="Remove animations" imageMso="MasterViewClose" screentip="Remove animations from all objects" onAction="RemoveAnimations" showLabel="false" enabled="true"/>
+          <button id="RemoveTransitionsButton" label="Remove slide transitions" imageMso="MasterViewClose" screentip="Remove transitions from all slides" onAction="RemoveTransitions" showLabel="false" enabled="true"/>
+          <toggleButton idMso="CommentsPane" imageMso="ReviewEditComment" showLabel="false" />
+          <button idMso="ReviewDeleteCommentPowerPoint" showLabel="false" />
+          <button idMso="ReviewNewComment" showLabel="false" />
+        </group>
+
+        <!-- NEW GROUP: COLLABORATION -->
+        <group id="collaborationGroup" label="Collaboration" imageMso="GroupMembers" >
+          <button id="EmailButton" label="Mail presentation" imageMso="FileNewEmail" screentip="Email Presentation" onAction="EmailPresentation" showLabel="false" keytip="e" />
+          <button id="EmailSelectedButton" label="Mail selected slides" imageMso="SendCopyOptions" screentip="Email selected Slides" onAction="EmailSelectedSlides" showLabel="false" keytip="es" />
+          <button id="ExportButton" label="Export presentation" imageMso="ExportSnapshot" screentip="Export selected slides" onAction="ExportSlides" showLabel="false" keytip="ee" />
+        </group>
+
+        <!-- NEW GROUP: TEXT -->
+        <group id="TextGroup" label="Text" imageMso="Spelling" >
+          <splitButton id="SpellingSplitButton" showLabel="false">
+            <button idMso ="Spelling" showLabel="false"/>
+            <menu id="SpellingMenu">
+              <button idMso ="Thesaurus" showLabel="false"/>
+            </menu>
+          </splitButton>
+          <splitButton id="LanguageSplitButton" showLabel="false">
+            <button id="SetLanguageButton_enUK" image="uk" label="English (UK)" onAction="SetLanguage" tag="enUK"/>
+            <menu id="LanguageMenu">
+              <button id="SetLanguageButton_deDE" image="germany" label="German" onAction="SetLanguage" tag="deDE"/>
+              <button id="SetLanguageButton_frFR" image="france" label="French" onAction="SetLanguage" tag="frFR"/>
+              <button id="SetLanguageButton_enUS" image="us" label="English (US)" onAction="SetLanguage" tag="enUS"/>
+            </menu>
+          </splitButton>
+          <splitButton id="TranslatorSplitButton" showLabel="false">
+            <button idMso ="Translator" showLabel="false"/>
+            <menu id="TranslatorMenu">
+              <button idMso ="LanguagePreferences"/>
+            </menu>
+          </splitButton>
+          <dialogBoxLauncher>
+            <button idMso ="PowerPointParagraphDialog"/>
+          </dialogBoxLauncher>
+        </group>
+
+        <!-- NEW GROUP: INSERTION -->
+        <group id="InsertionGroup" label="Insertion" imageMso="ShapesMoreShapes" >
+          <control idMso="SlideNewGallery" showLabel="false"/>
+          <toggleButton idMso="TextBoxInsert" showLabel="false"/>
+          <control idMso="GalleryAllShapesAndTextboxes" showLabel="false"/>
+          <button id="SetupScreenshot" label="Setup Screenshot" imageMso="Camera" screentip="Setup Screenshot" onAction="OpenScreenshot" showLabel="false"/>
+          <button idMso="ScreenClipping" showLabel="false"/>
+          <button idMso="SmartArtInsert" showLabel="false"/>
+          <separator id="FirstseparatorInsertionGroup" />
+          <gallery idMso="TableInsertGallery" showLabel="false"/>
+          <button id="AddCommentStickerInsideButton" imageMso="NewPostInThisFolder3" label="Add new Sticker on slide" onAction="AddCommentSticker" tag="inside" showLabel="false" keytip="ni" />
+          <button id="AddCommentStickerOutsideButton" imageMso="NewNote" label="Add new Sticker outside slide" onAction="AddCommentSticker" tag="outside" showLabel="false" keytip="no" />
+          <separator id="SecondseparatorInsertionGroup" />
+          <button idMso="ChartInsert" showLabel="false"/>
+          <button idMso="IconInsertFromFile" showLabel="false"/>
+          <!--<button idMso="InsertMSForms" showLabel="false"/>-->
+          <button idMso="HeaderFooterInsert" showLabel="false"/>
+          <!--<separator id="ThirdseparatorInsertionGroup" />-->
+          <!--<menu idMso="InsertZoomMenu" showLabel="false"/>-->
+          <!--<gallery idMso="InsertBuildingBlocksEquationsGallery" showLabel="false"/>-->
+          <!--<button idMso="SymbolInsert" showLabel="false"/>-->
+        </group>
+        
+        <!-- NEW GROUP: Linked slides & Objects-->
+        <group id="LinkedSlidesObjectsGroup" label="Links" imageMso="FileLinksToFiles" >
+          <button id="NewLinkButton" label="Insert new Slide with Master Link" imageMso="FileNew" screentip="Insert a new Slide after currently selected slide with reference to the master slide" onAction="NewLink" showLabel="false" />
+          <button id="EditLinkButton" label="Edit Master Link" imageMso="FileLinksToFiles" screentip="Edit link of currently selected slide referenced master slide" onAction="EditLink" showLabel="false" />
+          <button id="UpdateSlideButton" label="Update Slide" imageMso="MailMergeUpdateLabels" screentip="Update current slide with newest version of master slide" onAction="UpdateSlide" showLabel="false" enabled="true"/>
+          <separator id="FirstseparatorLinkedSlidesObjectsGroup" />
+          <button id="NewLinkButtonObject" label="Generate Master Link for selected Object" imageMso="FileNewWebPage" screentip="Generate a new / retrieve the existing UUID for the selected object to be able to use it for the linked objects functionality" onAction="NewObjectLink" showLabel="false" />
+          <button id="PasteObjectButton" label="Paste linked Object" imageMso="PasteTableFromExcel" screentip="Paste the linked Object onto the current slide" onAction="PasteObject" showLabel="false" enabled="true"/>
+          <button id="UpdateObjectButton" label="Update selected linked Object" imageMso="MailMergeUpdateLabels" screentip="Update the selected object with the newest version of the master object" onAction="UpdateObject" showLabel="false" enabled="true"/>
+          <separator id="SecondseparatorLinkedSlidesObjectsGroup" />
+          <button id="UpdateChildObjectButton" label="Update slave objects related to selected master Object" imageMso="RefreshMenu" screentip="Update all slave objects, or in case of a selected master object, update all slave objects related to the selected master Object" onAction="UpdateSlaveObject" showLabel="false" enabled="true"/>
+          <button id="OpenFileLocationButton" label="Update File Location" imageMso="FileOpen" screentip="Navigate to File location" onAction="OpenFileLocation" showLabel="false" enabled="true"/>
+        </group>
+
+        <!-- NEW GROUP: SMART MIRROR -->
+        <group id="SmartMirrorGroup" label="Smart Mirror" imageMso="Copy" >
+          <button id="CopyMirrorButton" label="Copy as Mirror" imageMso="Copy" screentip="Copy selected shape as a Smart Mirror source" onAction="CopyMirror" showLabel="false" />
+          <button id="PasteMirrorButton" label="Paste Mirror" imageMso="Paste" screentip="Paste the Smart Mirror shape" onAction="PasteMirror" showLabel="false" />
+        </group>
+
+        <!-- NEW GROUP: VIEW -->
+        <group id="ViewGroup" label="View" imageMso="ViewNormalViewPowerPoint" >
+          <toggleButton idMso="ViewThumbnailViewPowerPoint" showLabel="false"/>
+          <toggleButton idMso="ViewSlideMasterView" showLabel="false"/>
+          <toggleButton idMso="ViewSlideSorterView" showLabel="false"/>
+        </group>
+
+        <!-- NEW GROUP: FONT -->
+        <group id="FontGroup" label="Font" imageMso="FontDialog" >
+          <box id="Fontbox" boxStyle="horizontal">
+            <comboBox idMso="Font" showLabel="false"/>
+            <comboBox idMso="FontSize" showLabel="false"/>
+          </box>
+          <buttonGroup id="AlignbuttonGroup">
+            <toggleButton idMso="AlignLeft" showLabel="false"/>
+            <toggleButton idMso="AlignCenter" showLabel="false"/>
+            <toggleButton idMso="AlignRight" showLabel="false"/>
+            <toggleButton idMso="AlignJustify" showLabel="false"/>
+            <toggleButton idMso="Strikethrough" showLabel="false"/>
+          </buttonGroup>
+          <buttonGroup id="BulletsbuttonGroup">
+            <gallery idMso="BulletsGallery" showLabel="false"/>
+            <gallery idMso="NumberingGallery" showLabel="false"/>
+            <splitButton id="IndentSplitButton" showLabel="false">
+              <button idMso="IndentIncrease" showLabel="false"/>
+              <menu id="IndentMenu">
+                <button idMso="IndentDecrease" showLabel="false"/>
+              </menu>
+            </splitButton>
+          </buttonGroup>
+          <box id="FontIncreaseDecreasebox" boxStyle="horizontal">
+            <button idMso="FontSizeIncrease" showLabel="false"/>
+            <button idMso="FontSizeDecrease" showLabel="false"/>
+            <gallery idMso="LineSpacingGalleryPowerPoint" showLabel="false"/>
+          </box>
+          <box id="TextAlignbox" boxStyle="horizontal">
+            <gallery idMso="TextAlignGallery" showLabel="false"/>
+            <gallery idMso="TextDirectionGallery" showLabel="false"/>
+          </box>
+          <box id="SuperSubscriptbox" boxStyle="horizontal">
+            <toggleButton idMso="Superscript" showLabel="false"/>
+            <toggleButton idMso="Subscript" showLabel="false"/>
+          </box>
+          <!--<box id="CharacterSpacingbox" boxStyle="horizontal">
+            <gallery idMso="CharacterSpacingGallery" showLabel="false"/>
+            <gallery idMso="ChangeCaseGallery" showLabel="false"/>
+          </box>
+          <dialogBoxLauncher>
+            <button idMso="FontDialogPowerPoint" showLabel="false"/>
+          </dialogBoxLauncher>-->
+        </group>
+
+        <!-- NEW GROUP: FORMAT -->
+        <group id="FormatGroup" label="Format" imageMso="PictureFormatDialog" >
+          <!--<gallery idMso="TextOutlineColorPicker" showLabel="false"/>
+          <menu idMso="TextEffectsMenu" showLabel="false"/>-->
+          <control idMso="FontColorPicker" showLabel="false"/>
+          <control idMso="TextHighlightColorPickerLicensed" showLabel="false"/>
+          <control idMso="ShapeFillColorPicker" showLabel="false" />
+          <control idMso="ShapeOutlineColorPicker" showLabel="false"/>
+          <button idMso="EyedropperFill" showLabel="false" />
+          <button idMso="EyedropperOutline" showLabel="false" />
+          <separator id="FirstseparatorFormatGroup" />
+          <gallery idMso="ArrowStyleGallery" showLabel="false"/>
+          <gallery idMso="OutlineWeightGallery" showLabel="false"/>
+          <gallery idMso="OutlineDashesGallery" showLabel="false"/>
+          <separator id="SecondseparatorFormatGroup" />
+          <button idMso="PickUpStyle" showLabel="false"/>
+          <button idMso="PasteSpecialDialog" showLabel="false"/>
+          <control idMso="FormatPainter" showLabel="false"/>
+          <button id="ColorsPaneButton" label="Colors" imageMso="ColorGrayscaleMenu" screentip="Open Color Palette" onAction="OpenColorsPane" showLabel="false" />
+          <dialogBoxLauncher>
+            <button idMso="ObjectFormatDialog" showLabel="false"/>
+          </dialogBoxLauncher>
+        </group>
+
+        <!-- NEW GROUP: ALIGNMENT -->
+        <group id="AlignmentGroup" label="Alignment" imageMso="ObjectsAlignCenterInFormVertically" >
+          <box id="ObjectsAlignHorizontalbox" boxStyle="vertical">
+            <button idMso="ObjectsAlignLeftSmart" showLabel="false" keytip="al" />
+            <button idMso="ObjectsAlignCenterHorizontalSmart" showLabel="false" keytip="ahc" />
+            <button idMso="ObjectsAlignRightSmart" showLabel="false" keytip="ar" />
+          </box>
+          <box id="ObjectsAlignVerticalbox" boxStyle="vertical">
+            <button idMso="ObjectsAlignTopSmart" showLabel="false" keytip="at" />
+            <button idMso="ObjectsAlignMiddleVerticalSmart" showLabel="false" keytip="avc" />
+            <button idMso="ObjectsAlignBottomSmart" showLabel="false" keytip="ab" />
+          </box>
+          <separator id="FirstseparatorAlignmentGroup" />
+          <box id="HorizontalSpacingbox" boxStyle="vertical">
+            <button id="HorizontalSpacingDecreasebutton" imageMso="HorizontalSpacingDecrease" label="Decrease horizontal gap between shapes" showLabel="false" onAction="ObjectsDecreaseSpacingHorizontal" keytip="hd" />
+            <button id="HorizontalSpacingIncreasebutton" imageMso="HorizontalSpacingIncrease" label="Increase horizontal gap between shapes" showLabel="false" onAction="ObjectsIncreaseSpacingHorizontal" keytip="hi" />
+            <button id="HorizontalSpacingRemovebutton" imageMso="ObjectsAlignDistributeHorizontallyRemove" label="Remove horizontal gap between shapes" showLabel="false" onAction="ObjectsRemoveSpacingHorizontal" keytip="hr" />
+          </box>
+          <box id="VerticalSpacingbox" boxStyle="vertical">
+            <button id="VerticalSpacingDecreasebutton" imageMso="VerticalSpacingDecrease" label="Decrease vertical gap between shapes" showLabel="false" onAction="ObjectsDecreaseSpacingVertical" keytip="vd" />
+            <button id="VerticalSpacingIncreasebutton" imageMso="VerticalSpacingIncrease" label="Increase vertical gap between shapes" showLabel="false" onAction="ObjectsIncreaseSpacingVertical" keytip="vi" />
+            <button id="VerticalSpacingRemovebutton" imageMso="ObjectsAlignDistributeVerticallyRemove" label="Remove vertical gap between shapes" showLabel="false" onAction="ObjectsRemoveSpacingVertical" keytip="vr" />
+          </box>
+          <separator id="SecondseparatorAlignmentGroup" />
+          <button idMso="ObjectFormatDialog" showLabel="false"/>
+          <button idMso="AlignDistributeVertically" showLabel="false" keytip="dv" />
+          <button idMso="AlignDistributeHorizontally" showLabel="false" keytip="dh" />
+        </group>
+
+        <!-- NEW GROUP: ORGANIZE -->
+        <group id="OrganizeGroup" label="Organize" imageMso="ObjectBringToFront" >
+          <box id="ObjectsGroupHorizontalbox" boxStyle="horizontal">
+            <button idMso="ObjectsGroup" showLabel="false" keytip="g" />
+            <button idMso="ObjectsUngroup" showLabel="false" keytip="u" />
+          </box>
+          <box id="ObjectsFrontHorizontalbox" boxStyle="horizontal">
+            <button idMso="ObjectBringToFront" showLabel="false" keytip="f" />
+            <button idMso="ObjectSendToBack" showLabel="false" keytip="b" />
+          </box>
+          <box id="ObjectsForwardHorizontalbox" boxStyle="horizontal">
+            <button idMso="ObjectBringForward" showLabel="false"/>
+            <button idMso="ObjectSendBackward" showLabel="false"/>
+          </box>
+          <separator id="separatorOrganizeGroup" />
+          <splitButton id="RotateSplitButton" showLabel="false">
+            <button idMso ="ObjectRotateLeft90" showLabel="false" keytip="rl" />
+            <menu id="ObjectRotateMenu">
+              <button idMso ="ObjectRotateRight90" showLabel="false" keytip="rr" />
+              <button idMso ="ObjectFlipHorizontal" showLabel="false" keytip="fh" />
+              <button idMso ="ObjectFlipVertical" showLabel="false" keytip="fv" />
+            </menu>
+          </splitButton>
+          <splitButton id="CombineShapesSplitButton" showLabel="false">
+            <button idMso ="ShapesUnion" showLabel="false"/>
+            <menu id="CombineShapesMenu">
+              <button idMso ="ShapesCombine" showLabel="false"/>
+              <button idMso ="ShapesFragment" showLabel="false"/>
+              <button idMso ="ShapesIntersect" showLabel="false"/>
+              <button idMso ="ShapesSubtract" showLabel="false"/>
+            </menu>
+          </splitButton>
+          <toggleButton idMso ="SelectionPane" showLabel="false"/>
+        </group>
+
+        <!-- NEW GROUP: SIZE -->
+        <group id="SizeGroup" label="Size" imageMso="SizeToControlHeightAndWidth" >
+          <control idMso="ShapeHeight" showLabel="false" />
+          <control idMso="ShapeWidth" showLabel="false" />
+          <box id="SizeGroupHorizontalbox" boxStyle="horizontal">
+            <button id="MakeSameHeightButton" showLabel="false" imageMso="SizeToControlHeight" onAction="MakeSameHeight" keytip="sh" />
+            <button id="MakeSameWidthButton" showLabel="false" imageMso="SizeToControlWidth" onAction="MakeSameWidth" keytip="sw" />
+            <button id="MakeSameSizeButton" showLabel="false" imageMso="SizeToControlHeightAndWidth" onAction="MakeSameSize" />
+            <toggleButton id="LockAspectRatioButton" getLabel="GetLockRatioLabel" onAction="LockRatio" getPressed="GetLockRatioPressed" getEnabled="GetLockRatioEnabled" />
+          </box>
+          <dialogBoxLauncher>
+            <button idMso="ObjectSizeAndPositionDialog" />
+          </dialogBoxLauncher>          
+        </group>
+
+        <!-- NEW GROUP: PICTURE - DYNAMIC -->
+        <group id="PictureGroup" label="Picture" imageMso="PictureInsertMenu" getVisible="GetVisible" tag="DynamicPictureGroup" >
+          <menu idMso="PictureColorMenu" showLabel="false" />
+          <splitButton idMso="PictureCropTools" showLabel="false" keytip="c" />
+          <menu idMso="ShapeEffectsMenu" showLabel="false" />
+          <gallery idMso="PictureTransparencyGallery" showLabel="false" />
+          <menu idMso="PictureCorrectionsMenu" showLabel="false" />
+          <toggleButton idMso="PictureBackgroundRemoval" showLabel="false" />
+          <dialogBoxLauncher>
+            <button idMso="PictureFormatDialog" />
+          </dialogBoxLauncher>
+        </group>
+
+        <!-- NEW GROUP: TABLE - DYNAMIC -->
+        <group id="TableGroup" label="Table" imageMso="TableInsert" getVisible="GetVisible" tag="DynamicTableGroup" >
+          <checkBox idMso="TableStyleFirstRowPowerPoint" />
+          <checkBox idMso="TableStyleBandedRowsPowerPoint" />
+          <checkBox idMso="TableStyleFirstColumnPowerPoint" />
+          <dropDown idMso="TableDrawBorderPenStyle" showLabel="false" />
+          <dropDown idMso="TableDrawBorderPenWeight" showLabel="false" />
+          <gallery idMso="TableBorderPenColorPicker" />
+          <toggleButton idMso="TableDrawTable" showLabel="false" />
+          <toggleButton idMso="TableEraser" showLabel="false" />
+          <splitButton idMso="TableBordersMenu" showLabel="false" />
+          <separator id="FirstseparatorTableGroup" />
+          <box id="TableInsertRowsbox" boxStyle="horizontal">
+            <button idMso="TableInsertRowsAbove" showLabel="false" />
+            <button idMso="TableInsertRowsBelow" showLabel="false" />
+          </box>
+          <box id="TableInsertColumnsbox" boxStyle="horizontal">
+            <button idMso="TableInsertColumnsLeft" showLabel="false" />
+            <button idMso="TableInsertColumnsRight" showLabel="false" />
+          </box>
+          <box id="TableDeletebox" boxStyle="horizontal">
+            <button idMso="TableDeleteColumns" showLabel="false" />
+            <button idMso="TableDeleteRows" showLabel="false" />
+          </box>
+          <separator id="SecondseparatorTableGroup" />
+          <splitButton id="SplitMergeMarginsSplitButton" showLabel="false">
+            <button idMso="MergeCells" showLabel="false" />
+            <menu id="MergeSplitMarginsMenu">
+              <button idMso="MergeCells" showLabel="false" />
+              <button idMso="SplitCells" showLabel="false" />
+              <gallery idMso="TableCellMarginsGallery" showLabel="false" />
+            </menu>
+          </splitButton>
+          <button idMso="TableRowsDistribute" showLabel="false" />
+          <button idMso="TableColumnsDistribute" showLabel="false" />
+        </group>
+
+        <!-- NEW GROUP: TEST - DEVELOPMENT MODE IS SWITCHED ON -->
+        <group id="TestGroup" label="Test" imageMso="TableInsert" getVisible="GetDevelopmentVisibility" >
+          <button id="TestButton" label="Test Button" size="large" imageMso="HappyFace" screentip="Test Button only to be shown for Development Mode" showLabel="false"/>
+        </group>
+
+
+
+        <!--
+                <group id="TestGroup" label="Test">
+                    <button id="button" />
+                    <toggleButton id="toggleButton" />
+                    <gallery id="Gallery" />
+                    <comboBox id="comboBox" />
+                    <box id="box" boxStyle="horizontal">
+                        <button id="button11" label="Button 1" imageMso="HappyFace" />
+                        <button id="button12" label="Button 2" imageMso="HappyFace" />
+                    </box>
+                    <buttonGroup id="buttonGroup">
+                        <button id="button21" imageMso="Bold" />
+                        <button id="button22" imageMso="Italic" />
+                        <button id="button23" imageMso="Underline" />
+                    </buttonGroup>
+                    <dialogBoxLauncher>
+                        <button id="dialogBoxLauncher" />
+                    </dialogBoxLauncher>
+                </group>
+                <group id="EmptyGroup" label="Empty">
+                    <gallery idMso="" showLabel="false"/>
+                    <button idMso="" showLabel="false"/>
+                </group>
+                -->
+      </tab>
+    </tabs>
+  </ribbon>
+</customUI>
+

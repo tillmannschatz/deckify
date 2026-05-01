@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>12.0</LangVersion>
+    <RootNamespace>Deckify</RootNamespace>
+    <AssemblyName>Deckify.Core</AssemblyName>
+    <Nullable>disable</Nullable>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
+  <!--
+    Strong-Naming nur unter VS-MSBuild (Full Framework). Das .NET SDK
+    (dotnet build/test) unterstuetzt kein PFX-Signing — Core wird dort
+    unsigned gebaut (nur fuer Test-Runs relevant). Beim VSTO-Build via
+    VS-MSBuild signiert MSBuild Core mit demselben PFX wie das
+    Hauptprojekt, sodass VSTO das gleiche Strong-Name vorfindet.
+  -->
+  <PropertyGroup Condition="'$(MSBuildRuntimeType)' == 'Full'">
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\Deckify\effensify.pfx</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+</Project>
